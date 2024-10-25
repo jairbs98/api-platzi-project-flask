@@ -1,10 +1,10 @@
-## Contenedor Docker (Podman)
+## Contenedor Podman
 
-Este proyecto utiliza un contenedor Docker (Podman) para facilitar su despliegue y asegurar la consistencia del entorno de ejecución. 
+Este proyecto utiliza un contenedor Docker/Podman para facilitar su despliegue y asegurar la consistencia del entorno de ejecución. 
 
 **Containerfile**
 
-El archivo `Containerfile` define las instrucciones para construir la imagen Docker:
+El archivo `Containerfile` define las instrucciones para construir la imagen Podman:
 
 ```dockerfile
 FROM python:3.12-alpine  # Usa la imagen base de Python 3.12 en Alpine Linux
@@ -25,13 +25,20 @@ EXPOSE 5000  # Expone el puerto 5000
 CMD ["python", "main.py"]  # Comando para ejecutar la aplicación
 ```
 
-```linux
-podman build -t mi-imagen-flask .
+**Construir la imagen Podman:**
 
+```bash
+podman build -t mi-imagen-flask .
+```
+
+**Construir la imagen Podman:**
+
+```bash
 podman run -d \
-  --name platzi-project-flask \
-  -v 'api-platzi-project-flask:/app' \
-  -v "C:\ruta\a\tu\clave\privada.json:/app/clave_privada.json" \
-  -e GOOGLE_APPLICATION_CREDENTIALS="/app/clave_privada.json" \
-  -p 5001:5000 \
-  mi-imagen-flask
+  --name platzi-project-flask \  # Nombre del contenedor
+  -v 'api-platzi-project-flask:/app' \  # Monta el código fuente en el contenedor
+  -v "/ruta/a/mi/clave.json:/app/clave_privada.json" \  # Monta la clave privada (¡recuerda reemplazar la ruta!)
+  -e GOOGLE_APPLICATION_CREDENTIALS="/app/clave_privada.json" \  # Configura la variable de entorno para la clave privada
+  -p 5001:5000 \  # Mapea el puerto 5000 del contenedor al puerto 5001 del host
+  mi-imagen-flask   # Nombre de la imagen
+  ```
