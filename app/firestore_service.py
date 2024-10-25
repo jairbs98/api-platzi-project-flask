@@ -1,15 +1,12 @@
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
+import os
+from google.cloud import firestore
 
-project_id = 'flask-project-398117'
+# Asegúrate de que la variable de entorno esté configurada
+if 'GOOGLE_APPLICATION_CREDENTIALS' not in os.environ:
+    raise ValueError("La variable de entorno GOOGLE_APPLICATION_CREDENTIALS no está configurada.")
 
-cred = credentials.ApplicationDefault()
-firebase_admin.initialize_app(cred, {
-    'projectId': project_id
-})
-
-db = firestore.client()
+# Inicializa Firestore
+db = firestore.Client()
 
 
 def get_users():
@@ -47,4 +44,3 @@ def update_todo(user_id, todo_id, done):
 
 def _get_todo_ref(user_id, todo_id):
     return db.document('users/{}/todos/{}'.format(user_id, todo_id))
-
