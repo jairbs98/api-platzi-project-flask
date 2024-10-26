@@ -7,26 +7,35 @@ img {
 }
 
 .navbar-custom {
-    background-color: #4F709C; /* Cambiar color de fondo */
+    background-color: #4F709C;
+    /* Cambiar color de fondo */
 }
 
-.navbar-custom .nav > li > a {
-    color: #F0F0F0; /* Cambiar color del texto */
+.navbar-custom .nav>li>a {
+    color: #F0F0F0;
+    /* Cambiar color del texto */
 }
 
-.navbar-custom .nav > li > a:hover {
+.navbar-custom .nav>li>a:hover {
     background-color: #47658c;
     color: #F0F0F0;
 }
 
 .custom-flash {
-    width: 300px; /* Cambia el ancho según tus necesidades */
-    height: auto; /* Permite que la altura se ajuste automáticamente al contenido */
-    text-align: center; /* Centra el texto horizontalmente */
-    position: fixed; /* Cambia la posición del mensaje a fija */
-    top: 55px; /* Ajusta la distancia desde la parte superior según tus necesidades */
-    right: 20px; /* Centra horizontalmente el mensaje */
-    z-index: 1000; /* Ajusta la posición en la pila de capas si es necesario */
+    width: 300px;
+    /* Cambia el ancho según tus necesidades */
+    height: auto;
+    /* Permite que la altura se ajuste automáticamente al contenido */
+    text-align: center;
+    /* Centra el texto horizontalmente */
+    position: fixed;
+    /* Cambia la posición del mensaje a fija */
+    top: 55px;
+    /* Ajusta la distancia desde la parte superior según tus necesidades */
+    right: 20px;
+    /* Centra horizontalmente el mensaje */
+    z-index: 1000;
+    /* Ajusta la posición en la pila de capas si es necesario */
 }
 
 .custom-flash .close {
@@ -69,24 +78,30 @@ img {
 
 .div-form-container {
     display: flex;
-    justify-content: space-between; /* Espacio entre los elementos */
+    justify-content: space-between;
+    /* Espacio entre los elementos */
 }
 
 .right-align {
-    margin-left: auto; /* Alinea el div a la derecha */
+    margin-left: auto;
+    /* Alinea el div a la derecha */
 }
 
 /* main.css */
 .custom-input {
     /* Cambia los estilos de los campos de formulario, por ejemplo, el color de fondo */
-    background-color: #EFEFEF; /* Cambia el color de fondo a gris claro */
-    color: #333; /* Cambia el color del texto a negro */
+    background-color: #EFEFEF;
+    /* Cambia el color de fondo a gris claro */
+    color: #333;
+    /* Cambia el color del texto a negro */
     /* Agrega cualquier otro estilo personalizado que desees */
 }
 
 .custom-button {
     /* Cambia los estilos del botón, por ejemplo, el color de fondo y el color del texto */
-    background-color: #007BFF; /* Cambia el color de fondo a azul */
-    color: #FFFFFF; /* Cambia el color del texto a blanco */
+    background-color: #007BFF;
+    /* Cambia el color de fondo a azul */
+    color: #FFFFFF;
+    /* Cambia el color del texto a blanco */
     /* Agrega cualquier otro estilo personalizado que desees */
 }
