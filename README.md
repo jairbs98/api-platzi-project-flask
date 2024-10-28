@@ -37,8 +37,8 @@ podman build -t mi-imagen-flask .
 podman run -d \
   --name platzi-project-flask \  # Nombre del contenedor
   -v 'api-platzi-project-flask:/app' \  # Monta el código fuente en el contenedor
-  -v "/ruta/a/mi/clave.json:/app/clave_privada.json" \  # Monta la clave privada (¡recuerda reemplazar la ruta!)
-  -e GOOGLE_APPLICATION_CREDENTIALS="/app/clave_privada.json" \  # Configura la variable de entorno para la clave privada
+  -v "/ruta/a/mi/clave.json:/clave_privada.json" \  # Monta la clave privada (¡recuerda reemplazar la ruta!)
+  -e GOOGLE_APPLICATION_CREDENTIALS="/clave_privada.json" \  # Configura la variable de entorno para la clave privada
   -p 5001:5000 \  # Mapea el puerto 5000 del contenedor al puerto 5001 del host
   mi-imagen-flask   # Nombre de la imagen
   ```
