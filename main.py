@@ -1,5 +1,5 @@
 import unittest
-from flask import ( # type: ignore
+from flask import (  # type: ignore
     request,
     make_response,
     redirect,
@@ -8,7 +8,7 @@ from flask import ( # type: ignore
     flash,
     url_for,
 )
-from flask_login import login_required, current_user # type: ignore
+from flask_login import login_required, current_user  # type: ignore
 
 from app import create_app
 from app.forms import TodoForm, DeleteTodoForm, UpdateTodoForm

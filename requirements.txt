@@ -6,3 +6,4 @@ blinker
 firebase-admin
 google-cloud-firestore
 flask_login
+email_validator
