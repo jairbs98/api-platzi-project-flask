@@ -8,40 +8,32 @@ img {
 
 .navbar-custom {
     background-color: #4F709C;
-    /* Cambiar color de fondo */
-}
 
-.navbar-custom .nav>li>a {
-    color: #F0F0F0;
-    /* Cambiar color del texto */
-}
+    .nav>li>a {
+        color: #F0F0F0;
 
-.navbar-custom .nav>li>a:hover {
-    background-color: #47658c;
-    color: #F0F0F0;
+        &:hover,
+        &:active,
+        &:focus {
+            background-color: #47658c;
+        }
+    }
 }
 
 .custom-flash {
     width: 300px;
-    /* Cambia el ancho según tus necesidades */
     height: auto;
-    /* Permite que la altura se ajuste automáticamente al contenido */
     text-align: center;
-    /* Centra el texto horizontalmente */
     position: fixed;
-    /* Cambia la posición del mensaje a fija */
     top: 55px;
-    /* Ajusta la distancia desde la parte superior según tus necesidades */
     right: 20px;
-    /* Centra horizontalmente el mensaje */
     z-index: 1000;
-    /* Ajusta la posición en la pila de capas si es necesario */
-}
 
-.custom-flash .close {
-    position: absolute;
-    right: 15px;
-    top: 15px;
+    .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+    }
 }
 
 .align-center {
