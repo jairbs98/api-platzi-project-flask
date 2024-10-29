@@ -1,3 +1,4 @@
+from mailbox import Message
 import secrets
 from datetime import datetime, timedelta
 
@@ -14,8 +15,8 @@ from app.forms import (
     LoginForm,
     ChangePasswordForm,
     ResetPasswordForm,
-    SignupForm,  # Import SignupForm
-)  # Import ChangePasswordForm
+    SignupForm,
+)
 
 
 from . import auth
@@ -59,19 +60,19 @@ def login():
 
 @auth.route("/signup", methods=["GET", "POST"])  # Corrected: /signup
 def signup():
-    signup_form = SignupForm()  # Use SignupForm
+    signup_form = SignupForm()
     context = {"signup_form": signup_form}
 
     if signup_form.validate_on_submit():
         username = signup_form.username.data
         password = signup_form.password.data
-        email = signup_form.email.data  # Get the email
+        email = signup_form.email.data
 
         user_doc = get_user(username)
 
         if user_doc.to_dict() is None:
             password_hash = generate_password_hash(password)
-            user_data = UserData(username, password_hash, email)  # Pass the email
+            user_data = UserData(username, password_hash, email)
             user_put(user_data)
 
             user = UserModel(user_data)
@@ -87,7 +88,7 @@ def signup():
     return render_template("signup.html", **context)
 
 
-@auth.route("/change_password", methods=["GET", "POST"])  # New route
+@auth.route("/change_password", methods=["GET", "POST"])
 @login_required
 def change_password():
     change_password_form = ChangePasswordForm()
