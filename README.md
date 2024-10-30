@@ -28,17 +28,17 @@ CMD ["python", "main.py"]  # Comando para ejecutar la aplicación
 **Construir la imagen Podman:**
 
 ```bash
-podman build -t mi-imagen-flask .
+podman build -t flask-image .
 ```
 
 **Construir la imagen Podman:**
 
 ```bash
 podman run -d -it \
-  --name platzi-project-flask \  # Nombre del contenedor
-  -v 'api-platzi-project-flask:/app' \  # Monta el código fuente en el contenedor
-  -v "/ruta/a/mi/clave.json:/clave_privada.json" \  # Monta la clave privada
-  -e GOOGLE_APPLICATION_CREDENTIALS="/clave_privada.json" \  # Configura la variable de entorno para la clave privada
-  -p 5001:5000 \  # Mapea el puerto 5000 del contenedor al puerto 5001 del host
-  flask-image   # Nombre de la imagen
+  --name platzi-project-flask \
+  -v 'api-platzi-project-flask:/app' \
+  -v "/ruta/a/mi/clave.json:/clave_privada.json" \
+  -e GOOGLE_APPLICATION_CREDENTIALS="/clave_privada.json" \
+  -p 5001:5000 \
+  flask-image
   ```
