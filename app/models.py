@@ -1,5 +1,30 @@
-from flask_login import UserMixin # type: ignore
-from .firestore_service import get_user
+from flask_login import UserMixin  # type: ignore
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy.orm import relationship
+
+from .database import Base, get_db  # Importa get_db
+
+
+class User(Base, UserMixin):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True)
+    email = Column(String, unique=True, index=True)
+    password = Column(String)
+
+    todos = relationship("Todo", back_populates="owner")
+
+
+class Todo(Base):
+    __tablename__ = "todos"
+
+    id = Column(Integer, primary_key=True, index=True)
+    description = Column(String, index=True)
+    done = Column(Boolean, default=False)
+    owner_id = Column(Integer, ForeignKey("users.id"))
+
+    owner = relationship("User", back_populates="todos")
 
 
 class UserData:
@@ -20,11 +45,17 @@ class UserModel(UserMixin):
 
     @staticmethod
     def query(user_id):
-        user_doc = get_user(user_id)
+        user_doc = get_user(user_id)  # Llama a la función get_user local
         user_data = UserData(
-            username=user_doc.id,
-            password=user_doc.to_dict()["password"],
-            email=user_doc.to_dict().get("email"),  # Obtener el email
+            username=user_doc.username,  # Accede al atributo username
+            password=user_doc.password,  # Accede al atributo password
+            email=user_doc.email,  # Accede al atributo email
         )
 
         return UserModel(user_data)
+
+
+def get_user(username, db=None):  # Agrega el argumento db
+    if db is None:
+        db = next(get_db())  # Crea una nueva sesión solo si no se proporciona
+    return db.query(User).filter(User.username == username).first()
