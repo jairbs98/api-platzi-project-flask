@@ -3,7 +3,7 @@ flask-bootstrap
 flask-wtf
 flask-testing
 blinker
-firebase-admin
-google-cloud-firestore
 flask_login
 email_validator
+sqlalchemy  
+psycopg2-binary
