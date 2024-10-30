@@ -1,4 +1,5 @@
 import unittest
+
 from flask import (  # type: ignore
     request,
     make_response,
@@ -12,7 +13,9 @@ from flask_login import login_required, current_user  # type: ignore
 
 from app import create_app
 from app.forms import TodoForm, DeleteTodoForm, UpdateTodoForm
-from app.firestore_service import get_todos, put_todo, delete_todo, update_todo
+from app.crud import get_todos, create_todo, delete_todo, update_todo
+from app.database import get_db  # Importa get_db
+from app.models import get_user  # Importa get_user
 
 app = create_app()
 
@@ -44,15 +47,17 @@ def index():
 @app.route("/hello", methods=["GET", "POST"])
 @login_required
 def hello():
+    db = next(get_db())  # Obtén una sesión de la base de datos
     user_ip = session.get("user_ip")
-    username = current_user.id
+    user = get_user(current_user.id)  # Obtén el objeto User
+    username = user.username  # Accede al username del usuario
     todo_form = TodoForm()
     delete_form = DeleteTodoForm()
     update_form = UpdateTodoForm()
 
     context = {
         "user_ip": user_ip,
-        "todos": get_todos(user_id=username),
+        "todos": get_todos(user_id=user.id),  # Usa el ID numérico del usuario
         "username": username,
         "todo_form": todo_form,
         "delete_form": delete_form,
@@ -60,7 +65,10 @@ def hello():
     }
 
     if todo_form.validate_on_submit():
-        put_todo(user_id=username, description=todo_form.description.data)
+        create_todo(
+            user_id=user.id,  # Usa el ID numérico del usuario
+            description=todo_form.description.data,
+        )
 
         flash("Your task was created successfully!")
 
@@ -71,7 +79,8 @@ def hello():
 
 @app.route("/todos/delete/<todo_id>", methods=["POST"])
 def delete(todo_id):
-    user_id = current_user.id
+    user = get_user(current_user.id)  # Obtén el objeto User
+    user_id = user.id  # Usa el ID numérico del usuario
     delete_todo(user_id=user_id, todo_id=todo_id)
 
     return redirect(url_for("hello"))
@@ -79,7 +88,8 @@ def delete(todo_id):
 
 @app.route("/todos/update/<todo_id>/<int:done>", methods=["POST"])
 def update(todo_id, done):
-    user_id = current_user.id
+    user = get_user(current_user.id)  # Obtén el objeto User
+    user_id = user.id  # Usa el ID numérico del usuario
     update_todo(user_id=user_id, todo_id=todo_id, done=done)
 
     return redirect(url_for("hello"))
