@@ -2,14 +2,23 @@ from mailbox import Message
 import secrets
 from datetime import datetime, timedelta
 
-from flask import render_template, redirect, flash, url_for, current_app  # type: ignore
+from flask import ( # type: ignore
+    render_template,
+    redirect,
+    flash,
+    url_for,
+    current_app,
+)
 from flask_login import (  # type: ignore
     login_user,
     login_required,
     logout_user,
     current_user,
 )
-from werkzeug.security import generate_password_hash, check_password_hash  # type: ignore
+from werkzeug.security import ( # type: ignore
+    generate_password_hash,
+    check_password_hash,
+)
 
 from app.forms import (
     LoginForm,
@@ -18,36 +27,44 @@ from app.forms import (
     SignupForm,
 )
 
-
 from . import auth
-from app.firestore_service import get_user, user_put
-from app.models import UserModel, UserData
+from app.crud import create_user  # Elimina get_user de la importación
+from app.models import (
+    UserModel,
+    UserData,
+    User,
+    get_user,
+)  # Importa la clase User y get_user
+from app.database import get_db  # Importa get_db
 
 
 @auth.route("/login", methods=["GET", "POST"])
 def login():
     login_form = LoginForm()
     context = {"login_form": LoginForm()}
+    db = next(get_db())  # Obtén la sesión de la base de datos
 
     if login_form.validate_on_submit():
         username = login_form.username.data
         password = login_form.password.data
 
-        user_doc = get_user(username)
+        user = get_user(username, db=db)  # Obtiene el objeto User y pasa la sesión
 
-        if user_doc.to_dict() is not None:
-            password_from_db = user_doc.to_dict()["password"]
+        if user is not None:  # Verifica si el usuario existe
+            # Accede al atributo password del objeto User
+            password_from_db = user.password
 
-            # Verify the password using check_password_hash
+            # Verifica la contraseña usando check_password_hash
             if check_password_hash(password_from_db, password):
-                user_data = UserData(username, password, None)
-                user = UserModel(user_data)
+                # Crea una instancia de UserData con los datos del usuario
+                user_data = UserData(username, password, user.email)
+                user_model = UserModel(user_data)
 
-                login_user(user)
+                login_user(user_model)
 
                 flash("Welcome back.")
 
-                return redirect(url_for("hello"))  # Corrected: return redirect(...)
+                return redirect(url_for("hello"))
             else:
                 flash("The information does not match.")
         else:
@@ -62,18 +79,19 @@ def login():
 def signup():
     signup_form = SignupForm()
     context = {"signup_form": signup_form}
+    db = next(get_db())  # Obtén la sesión de la base de datos
 
     if signup_form.validate_on_submit():
         username = signup_form.username.data
         password = signup_form.password.data
         email = signup_form.email.data
 
-        user_doc = get_user(username)
+        user_doc = get_user(username, db=db)  # Pasa la sesión a get_user
 
-        if user_doc.to_dict() is None:
+        if user_doc is None:  # Verifica si user_doc es None
             password_hash = generate_password_hash(password)
             user_data = UserData(username, password_hash, email)
-            user_put(user_data)
+            create_user(user_data)  # Usa create_user
 
             user = UserModel(user_data)
 
@@ -93,17 +111,27 @@ def signup():
 def change_password():
     change_password_form = ChangePasswordForm()
     context = {"change_password_form": change_password_form}
+    db = next(get_db())  # Obtén la sesión al principio de la función
 
     if change_password_form.validate_on_submit():
         current_password = change_password_form.current_password.data
         new_password = change_password_form.new_password.data
 
-        user_doc = get_user(current_user.id)
-        password_from_db = user_doc.to_dict()["password"]
+        user = get_user(current_user.id, db=db)  # Pasa la sesión a get_user
 
-        if check_password_hash(password_from_db, current_password):
+        if user is not None and check_password_hash(user.password, current_password):
             new_password_hash = generate_password_hash(new_password)
-            user_doc.reference.update({"password": new_password_hash})
+
+            print(f"Contraseña actual (hash): {user.password}")
+            print(f"Nueva contraseña (hash): {new_password_hash}")
+
+            # Actualiza la contraseña en la base de datos
+            user.password = new_password_hash
+            print(f"Contraseña actualizada (hash): {user.password}")
+
+            db.commit()
+            db.refresh(user)  # Refresca el objeto user
+
             flash("Password changed successfully!")
             return redirect(url_for("hello"))
         else:
@@ -115,30 +143,34 @@ def change_password():
 @auth.route("/reset_password", methods=["GET", "POST"])
 def reset_password():
     reset_password_form = ResetPasswordForm()
+    db = next(get_db())  # Obtén la sesión de la base de datos
+
     if reset_password_form.validate_on_submit():
         username = reset_password_form.username.data
 
-        user_doc = get_user(username)
+        user = get_user(username, db=db)  # Obtiene el objeto User y pasa la sesión
 
-        if user_doc.to_dict() is not None:
-            # Generate a reset token
+        if user is not None:
+            # Genera un token de restablecimiento
             reset_token = secrets.token_urlsafe(32)
-            # Set the token expiration date (e.g., 1 hour)
+            # Establece la fecha de expiración del token (por ejemplo, 1 hora)
             expiration_date = datetime.now() + timedelta(hours=1)
-            user_doc.reference.update(
-                {"reset_token": reset_token, "expiration_date": expiration_date}
-            )
 
-            # Get the user's email
-            user_email = user_doc.to_dict().get("email")
+            # Actualiza el token y la fecha de expiración en la base de datos
+            user.reset_token = reset_token
+            user.expiration_date = expiration_date
+            db.commit()
+
+            # Obtiene el correo electrónico del usuario
+            user_email = user.email
 
             if user_email:
-                # Send an email to the user with the reset link
+                # Envía un correo electrónico al usuario con el enlace de restablecimiento
                 send_reset_password_email(
                     current_app._get_current_object(),
                     user_email,
                     username,
-                    reset_token,  # Pass the application as an argument
+                    reset_token,  # Pasa la aplicación como argumento
                 )
                 flash(
                     "An email has been sent with instructions to reset your password."
@@ -184,40 +216,37 @@ def send_reset_password_email(
 
 @auth.route("/reset_password/<token>", methods=["GET", "POST"])
 def reset_password_with_token(token):
-    reset_password_form = ChangePasswordForm()  # Reuse ChangePasswordForm
+    reset_password_form = ChangePasswordForm()  # Reusa ChangePasswordForm
     context = {"reset_password_form": reset_password_form}
 
     if reset_password_form.validate_on_submit():
         new_password = reset_password_form.new_password.data
 
-        # Search for the user with the reset token
-        users_ref = db.collection("users")
-        query = users_ref.where("reset_token", "==", token)
-        for user_doc in query.stream():  # Corrected: iterate over the query results
-            # Check if the token has expired
-            expiration_date = user_doc.to_dict().get("expiration_date")
+        # Busca al usuario con el token de restablecimiento
+        db = next(get_db())
+        user = db.query(User).filter(User.reset_token == token).first()
+
+        if user is not None:
+            # Verifica si el token ha expirado
+            expiration_date = user.expiration_date
             if (
                 expiration_date
                 and expiration_date.replace(tzinfo=None) > datetime.now()
             ):
-                # Encrypt the new password
+                # Encripta la nueva contraseña
                 new_password_hash = generate_password_hash(new_password)
-                # Update the password in Firestore
-                user_doc.reference.update(
-                    {
-                        "password": new_password_hash,
-                        "reset_token": None,
-                        "expiration_date": None,
-                    }
-                )
+
+                # Actualiza la contraseña en la base de datos
+                user.password = new_password_hash
+                user.reset_token = None
+                user.expiration_date = None
+                db.commit()
+
                 flash("Password changed successfully!")
                 return redirect(url_for("auth.login"))
             else:
                 flash("The reset token has expired.")
-                return redirect(
-                    url_for("auth.login")
-                )  # Redirect to login if the token has expired
-            break  # Exit the loop after processing the first document
+                return redirect(url_for("auth.login"))
         else:
             flash("Invalid reset token.")
 
