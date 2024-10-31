@@ -2,7 +2,9 @@ from mailbox import Message
 import secrets
 from datetime import datetime, timedelta
 
-from flask import ( # type: ignore
+from sqlalchemy.exc import IntegrityError  # type: ignore # Importa IntegrityError
+
+from flask import (  # type: ignore
     render_template,
     redirect,
     flash,
@@ -15,7 +17,7 @@ from flask_login import (  # type: ignore
     logout_user,
     current_user,
 )
-from werkzeug.security import ( # type: ignore
+from werkzeug.security import (  # type: ignore
     generate_password_hash,
     check_password_hash,
 )
@@ -28,30 +30,29 @@ from app.forms import (
 )
 
 from . import auth
-from app.crud import create_user  # Elimina get_user de la importación
+from app.crud import create_user
 from app.models import (
     UserModel,
     UserData,
     User,
     get_user,
-)  # Importa la clase User y get_user
-from app.database import get_db  # Importa get_db
+)
+from app.database import get_db
 
 
 @auth.route("/login", methods=["GET", "POST"])
 def login():
     login_form = LoginForm()
     context = {"login_form": LoginForm()}
-    db = next(get_db())  # Obtén la sesión de la base de datos
+    db = next(get_db())
 
     if login_form.validate_on_submit():
         username = login_form.username.data
         password = login_form.password.data
 
-        user = get_user(username, db=db)  # Obtiene el objeto User y pasa la sesión
+        user = get_user(username, db=db)
 
-        if user is not None:  # Verifica si el usuario existe
-            # Accede al atributo password del objeto User
+        if user is not None:
             password_from_db = user.password
 
             # Verifica la contraseña usando check_password_hash
@@ -79,27 +80,31 @@ def login():
 def signup():
     signup_form = SignupForm()
     context = {"signup_form": signup_form}
-    db = next(get_db())  # Obtén la sesión de la base de datos
+    db = next(get_db())  # Obtén la sesión de la base de datos aquí
 
     if signup_form.validate_on_submit():
         username = signup_form.username.data
         password = signup_form.password.data
         email = signup_form.email.data
 
-        user_doc = get_user(username, db=db)  # Pasa la sesión a get_user
+        existing_user = get_user(username, db=db)  # Verifica si el usuario ya existe
 
-        if user_doc is None:  # Verifica si user_doc es None
-            password_hash = generate_password_hash(password)
-            user_data = UserData(username, password_hash, email)
-            create_user(user_data)  # Usa create_user
+        if existing_user is None:
+            try:
+                password_hash = generate_password_hash(password)
+                user_data = UserData(username, password_hash, email)
+                create_user(user_data)  # Usa create_user
 
-            user = UserModel(user_data)
+                user = UserModel(user_data)
 
-            login_user(user)
+                login_user(user)
 
-            flash("Welcome!")
+                flash("Welcome!")
 
-            return redirect(url_for("hello"))
+                return redirect(url_for("hello"))
+            except IntegrityError:
+                db.rollback()  # Revierte la transacción en caso de error
+                flash("A user with that email already exists.")
         else:
             flash("The user exists!")
 
@@ -111,13 +116,13 @@ def signup():
 def change_password():
     change_password_form = ChangePasswordForm()
     context = {"change_password_form": change_password_form}
-    db = next(get_db())  # Obtén la sesión al principio de la función
+    db = next(get_db())
 
     if change_password_form.validate_on_submit():
         current_password = change_password_form.current_password.data
         new_password = change_password_form.new_password.data
 
-        user = get_user(current_user.id, db=db)  # Pasa la sesión a get_user
+        user = get_user(current_user.id, db=db)
 
         if user is not None and check_password_hash(user.password, current_password):
             new_password_hash = generate_password_hash(new_password)
@@ -125,12 +130,11 @@ def change_password():
             print(f"Contraseña actual (hash): {user.password}")
             print(f"Nueva contraseña (hash): {new_password_hash}")
 
-            # Actualiza la contraseña en la base de datos
             user.password = new_password_hash
             print(f"Contraseña actualizada (hash): {user.password}")
 
             db.commit()
-            db.refresh(user)  # Refresca el objeto user
+            db.refresh(user)
 
             flash("Password changed successfully!")
             return redirect(url_for("hello"))
