@@ -34,7 +34,6 @@ from app.crud import create_user
 from app.models import (
     UserModel,
     UserData,
-    User,
     get_user,
 )
 from app.database import get_db

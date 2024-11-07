@@ -14,8 +14,8 @@ from flask_login import login_required, current_user  # type: ignore
 from app import create_app
 from app.forms import TodoForm, DeleteTodoForm, UpdateTodoForm
 from app.crud import get_todos, create_todo, delete_todo, update_todo
-from app.database import get_db  # Importa get_db
-from app.models import get_user  # Importa get_user
+from app.database import get_db
+from app.models import get_user
 
 app = create_app()
 
