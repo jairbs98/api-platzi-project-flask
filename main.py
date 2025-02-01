@@ -47,17 +47,17 @@ def index():
 @app.route("/hello", methods=["GET", "POST"])
 @login_required
 def hello():
-    db = next(get_db())  # Obtén una sesión de la base de datos
+    db = next(get_db())
     user_ip = session.get("user_ip")
-    user = get_user(current_user.id)  # Obtén el objeto User
-    username = user.username  # Accede al username del usuario
+    user = get_user(current_user.id)
+    username = user.username
     todo_form = TodoForm()
     delete_form = DeleteTodoForm()
     update_form = UpdateTodoForm()
 
     context = {
         "user_ip": user_ip,
-        "todos": get_todos(user_id=user.id),  # Usa el ID numérico del usuario
+        "todos": get_todos(user_id=user.id),
         "username": username,
         "todo_form": todo_form,
         "delete_form": delete_form,
@@ -66,7 +66,7 @@ def hello():
 
     if todo_form.validate_on_submit():
         create_todo(
-            user_id=user.id,  # Usa el ID numérico del usuario
+            user_id=user.id,
             description=todo_form.description.data,
         )
 
@@ -79,8 +79,8 @@ def hello():
 
 @app.route("/todos/delete/<todo_id>", methods=["POST"])
 def delete(todo_id):
-    user = get_user(current_user.id)  # Obtén el objeto User
-    user_id = user.id  # Usa el ID numérico del usuario
+    user = get_user(current_user.id)
+    user_id = user.id
     delete_todo(user_id=user_id, todo_id=todo_id)
 
     return redirect(url_for("hello"))
@@ -88,8 +88,8 @@ def delete(todo_id):
 
 @app.route("/todos/update/<todo_id>/<int:done>", methods=["POST"])
 def update(todo_id, done):
-    user = get_user(current_user.id)  # Obtén el objeto User
-    user_id = user.id  # Usa el ID numérico del usuario
+    user = get_user(current_user.id)
+    user_id = user.id
     update_todo(user_id=user_id, todo_id=todo_id, done=done)
 
     return redirect(url_for("hello"))

@@ -2,10 +2,6 @@ html * {
     font-family: sans-serif;
 }
 
-img {
-    max-width: 35px;
-}
-
 .navbar-custom {
     background-color: #4F709C;
 
@@ -18,6 +14,21 @@ img {
             background-color: #47658c;
         }
     }
+}
+
+.navbar-brand {
+    /* Estilos para el enlace de la marca */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.navbar-brand img {
+    /* Estilos para la imagen dentro del enlace de la marca */
+    max-width: 35px;
+    /* Ajusta el tamaño máximo de la imagen según tus necesidades */
+    height: auto;
+    /* Mantiene la proporción de aspecto */
 }
 
 .form {
@@ -52,11 +63,6 @@ img {
 
 .align-center {
     text-align: center;
-}
-
-.vertical-spacing {
-    margin-top: 10px;
-    margin-bottom: 10px;
 }
 
 .vertical-spacing {
