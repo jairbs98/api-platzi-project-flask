@@ -3,12 +3,11 @@
 {% block head %}
 {{ super() }}
 <title>
-    {% block title %} Flask Platzi | {% endblock %}
+    {% block title %} Tasks | {% endblock %}
 </title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-<link rel="icon" href="{{ url_for('static', filename='images/platzi.png') }}" type="image/x-icon">
+<link rel="icon" href="{{ url_for('static', filename='images/task-logo.svg') }}" type="image/x-icon">
 {% endblock %}
-
 
 {% block body %}
 {% block navbar %}
