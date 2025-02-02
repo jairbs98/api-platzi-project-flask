@@ -31,7 +31,7 @@ CMD ["python", "main.py"]  # Comando para ejecutar la aplicación
 podman build -t flask-image .
 ```
 
-**Construir la imagen Podman:**
+**Construir la imagen Podman (Windows):**
 
 ```bash
 podman run -d -it \
