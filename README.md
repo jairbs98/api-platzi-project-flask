@@ -35,10 +35,9 @@ podman build -t flask-image .
 
 ```bash
 podman run -d -it \
-  --name platzi-project-flask \
+  --name todo-flask-container \
   -v 'api-platzi-project-flask:/app' \
-  -v "/ruta/a/mi/clave.json:/clave_privada.json" \
-  -e GOOGLE_APPLICATION_CREDENTIALS="/clave_privada.json" \
+  -network todo-flask-network  \
   -p 5001:5000 \
   flask-image
   ```
