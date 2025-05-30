@@ -1,6 +1,6 @@
-from flask_login import UserMixin  # type: ignore
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, func  # type: ignore
-from sqlalchemy.orm import relationship  # type: ignore
+from flask_login import UserMixin # type: ignore
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, func # type: ignore
+from sqlalchemy.orm import relationship # type: ignore
 
 from ..database import Base
 
@@ -17,3 +17,6 @@ class User(Base, UserMixin):
     is_active = Column(Boolean, default=True)
 
     todos = relationship("Todo", back_populates="owner")
+
+    reset_token = Column(String, nullable=True)
+    expiration_date = Column(DateTime(timezone=True), nullable=True)

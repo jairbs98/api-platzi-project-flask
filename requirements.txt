@@ -1,9 +1,11 @@
 flask
-flask-bootstrap
-flask-wtf
-flask-testing
+flask-wtf # Aún útil para la validación de formularios si quieres usarlo en el backend
+flask-testing # Para pruebas unitarias, aunque necesitarás adaptar los tests
 blinker
-flask_login
+flask_login # Opcional: Podrías eliminarlo si usas JWT puramente
 email_validator
-sqlalchemy  
+sqlalchemy
 psycopg2-binary
+Flask-JWT-Extended # Nuevo para JWT
+Flask-Cors # Nuevo para CORS
+Flask-Mail # Para enviar correos de restablecimiento (si lo implementas)
